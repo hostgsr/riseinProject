@@ -11,6 +11,13 @@ Program ID: 8RQ5EJsEarrovdJbwax6bNN4SspbjbRmwcuACCHJzzhD
 
 yarn install
 
+yarn add @solana/spl-token
+
+
+also make sure that Solana's Install Tool installed and you generated your key:
+sh -c "$(curl -sSfL https://release.solana.com/v1.17.10/install)"
+
+
 cd /program_client
 
 npx ts-node app.ts 8RQ5EJsEarrovdJbwax6bNN4SspbjbRmwcuACCHJzzhD
