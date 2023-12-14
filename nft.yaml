@@ -1,0 +1,121 @@
+cidl: "0.8"
+info:
+  name: PortfolioNFT
+  title: My Portfolio NFT
+  version: 1.0.0
+  license:
+    name: Unlicense
+    identifier: Unlicense
+types:
+  PortfolioMetadata:
+    solana:
+      seeds:
+        - name: "portfolio"
+        - name: mint
+          type: sol:pubkey
+    fields:
+      - name: name
+        type: string
+        solana:
+          attributes: [ cap:32 ]
+      - name: symbol
+        type: string
+        solana:
+          attributes: [ cap:10 ]
+      - name: description
+        type: string
+        solana:
+          attributes: [ cap:1024 ]
+      - name: seller_fee_basis_points
+        type: u64
+      - name: image
+        type: string
+        solana:
+          attributes: [ cap:256 ]
+      - name: collection
+        type: string
+        solana:
+          attributes: [ cap:256 ]
+      - name: properties
+        type: string
+        solana:
+          attributes: [ cap:2048 ] # JSON content for additional properties
+      - name: profession
+        type: string
+        solana:
+          attributes: [ cap:32 ]
+      - name: skills
+        type: string
+        solana:
+          attributes: [ cap:128 ]
+      - name: json_info
+        type: string
+        solana:
+          attributes: [ cap:1024 ] # JSON content as a string
+      - name: mint
+        type: sol:pubkey
+      - name: assoc_account
+        type: rs:option<sol:pubkey>
+methods:
+  - name: mint_portfolio_nft
+    uses:
+      - csl_spl_token.initialize_mint2
+      - csl_spl_assoc_token.create
+      - csl_spl_token.mint_to
+      - csl_spl_token.set_authority
+    inputs:
+      - name: mint
+        type: csl_spl_token.Mint
+        solana:
+          attributes: [ init ]
+      - name: portfolio
+        type: PortfolioMetadata
+        solana:
+          attributes: [ init ]
+          seeds:
+            mint: mint
+      - name: name
+        type: string
+      - name: symbol
+        type: string
+      - name: description
+        type: string
+      - name: seller_fee_basis_points
+        type: u64
+      - name: image
+        type: string
+      - name: collection
+        type: string
+      - name: properties
+        type: string
+      - name: profession
+        type: string
+      - name: skills
+        type: string
+      - name: json_info
+        type: string
+  - name: transfer_portfolio_nft
+    uses:
+      - csl_spl_assoc_token.create
+      - csl_spl_token.transfer_checked
+    inputs:
+      - name: mint
+        type: csl_spl_token.Mint
+      - name: portfolio
+        type: PortfolioMetadata
+        solana:
+          attributes: [ mut ]
+          seeds:
+            mint: mint
+  - name: burn_portfolio_nft
+    uses:
+      - csl_spl_token.burn
+    inputs:
+      - name: mint
+        type: csl_spl_token.Mint
+      - name: portfolio
+        type: PortfolioMetadata
+        solana:
+          attributes: [ mut ]
+          seeds:
+            mint: mint
