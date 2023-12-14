@@ -3,7 +3,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import * as os from "os";
 import {
-    burnPortfolioNftSendAndConfirm,
+	burnPortfolioNftSendAndConfirm,
 	CslSplTokenPDAs,
 	derivePortfolioMetadataPDA,
 	getPortfolioMetadata,
@@ -17,25 +17,25 @@ import * as readline from 'readline';
 
 
 async function saveKeypairToFile(keypair: Keypair, filename: string) {
-    const secretKey = keypair.secretKey.toString(); // Convert the secret key to string
-    await fs.writeFile(filename, secretKey); // Save the secret key to a file
+	const secretKey = keypair.secretKey.toString(); // Convert the secret key to string
+	await fs.writeFile(filename, secretKey); // Save the secret key to a file
 }
 
 
 
 // Function to prompt for target address
 function promptForAddress(): Promise<string> {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
 
-    return new Promise((resolve) => {
-        rl.question('Please enter the public address on solana devnet of person who needs my portfolio: ', (address) => {
-            rl.close();
-            resolve(address);
-        });
-    });
+	return new Promise((resolve) => {
+		rl.question('Please enter the public address on solana devnet of person who needs my portfolio: ', (address) => {
+			rl.close();
+			resolve(address);
+		});
+	});
 }
 
 
@@ -43,29 +43,29 @@ function promptForAddress(): Promise<string> {
 
 
 async function main(feePayer: Keypair) {
-    const args = process.argv.slice(2);
-    const connection = new Connection("https://api.devnet.solana.com", {
-        commitment: "confirmed",
-    });
+	const args = process.argv.slice(2);
+	const connection = new Connection("https://api.devnet.solana.com", {
+		commitment: "confirmed",
+	});
 
 
-    const progId = new PublicKey(args[0]!);
+	const progId = new PublicKey(args[0]!);
 
 
-    initializeClient(progId, connection);
+	initializeClient(progId, connection);
 
 
 
 
-    /**
-     * Create a keypair for the mint
-     */
-    const mint = Keypair.generate();
-    console.info("+==== Mint Address  ====+");
-    console.info(mint.publicKey.toBase58());
+	/**
+	 * Create a keypair for the mint
+	 */
+	const mint = Keypair.generate();
+	console.info("+==== Mint Address  ====+");
+	console.info(mint.publicKey.toBase58());
 
 
-    /**
+	/**
 	 * Create two wallets
 	 */
 	const johnDoeWallet = Keypair.generate();
@@ -101,7 +101,7 @@ async function main(feePayer: Keypair) {
 				}),
 			),
 		[feePayer, johnDoeWallet, janeDoeWallet],
-        );
+		);
 
 
 	/**
@@ -117,7 +117,7 @@ async function main(feePayer: Keypair) {
 	console.info(portfolioNFTPub.toBase58());
 
 
-    	/**
+		/**
 	 * Derive the John Doe's Associated Token Account, this account will be
 	 * holding the minted NFT.
 	 */
@@ -146,17 +146,17 @@ async function main(feePayer: Keypair) {
 
 
 
-    
-    
-    const targetAddressString = await promptForAddress();
-    const targetAddress = new PublicKey(targetAddressString);
+	
+	
+	const targetAddressString = await promptForAddress();
+	const targetAddress = new PublicKey(targetAddressString);
 
-    // Derive the Associated Token Account for the target address
-    const [targetATA] = CslSplTokenPDAs.deriveAccountPDA({
-        wallet: targetAddress,
-        mint: mint.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
-    });
+	// Derive the Associated Token Account for the target address
+	const [targetATA] = CslSplTokenPDAs.deriveAccountPDA({
+		wallet: targetAddress,
+		mint: mint.publicKey,
+		tokenProgram: TOKEN_PROGRAM_ID,
+	});
 
 
 
@@ -164,8 +164,8 @@ async function main(feePayer: Keypair) {
 	 * Mint a new NFT into John's wallet (technically, the Associated Token Account)
 	 */
 
-    // Define the JSON object
-    const jsonInfo = {
+	// Define the JSON object
+	const jsonInfo = {
 	"user": {
 	  "id": 12345,
 	  "name": "John Doe",
@@ -195,35 +195,35 @@ async function main(feePayer: Keypair) {
 
 
   // Convert the JSON object to a string
-    const jsonInfoString = JSON.stringify(jsonInfo);
-    
-    // Assuming this is where you define sellerFeeBasisPoints
-    let sellerFeeBasisPointsNumber: number = 5000; // your original number value
+	const jsonInfoString = JSON.stringify(jsonInfo);
+	
+	// Assuming this is where you define sellerFeeBasisPoints
+	let sellerFeeBasisPointsNumber: number = 5000; // your original number value
 
-    // Convert the number to bigint
-    let sellerFeeBasisPoints: bigint = BigInt(sellerFeeBasisPointsNumber);
+	// Convert the number to bigint
+	let sellerFeeBasisPoints: bigint = BigInt(sellerFeeBasisPointsNumber);
 
   // Mint a new NFT into John's wallet
   console.info("+==== Minting... ====+");
   await mintPortfolioNftSendAndConfirm({
-    wallet: johnDoeWallet.publicKey,
-    assocTokenAccount: johnDoeATA,
-    name: "Gleb Savelev",
-    profession: "Developer",
-    skills: "Next JS, Rust, Anchor, React",
-    jsonInfo: jsonInfoString,
-    signers: {
-        feePayer: feePayer,
-        funding: feePayer,
-        mint: mint,
-        owner: johnDoeWallet,
-    },
-    symbol: "GS",
-    description: "Gleb Savelev | Developer Portfolio",
-    sellerFeeBasisPoints:sellerFeeBasisPoints,
-    image: "https://placehold.co/600x600?text=Gleb%27s+Portfolio",
-    collection: "Portfolio",
-    properties: ""
+	wallet: johnDoeWallet.publicKey,
+	assocTokenAccount: johnDoeATA,
+	name: "Gleb Savelev",
+	profession: "Developer",
+	skills: "Next JS, Rust, Anchor, React",
+	jsonInfo: jsonInfoString,
+	signers: {
+		feePayer: feePayer,
+		funding: feePayer,
+		mint: mint,
+		owner: johnDoeWallet,
+	},
+	symbol: "GS",
+	description: "Gleb Savelev | Developer Portfolio | glebsavelev.com",
+	sellerFeeBasisPoints:sellerFeeBasisPoints,
+	image: "https://placehold.co/600x600?text=Gleb%27s+Portfolio",
+	collection: "Portfolio",
+	properties: ""
 });
   console.info("+==== Minted ====+");
 
@@ -245,7 +245,7 @@ async function main(feePayer: Keypair) {
 
 
 
-    /**
+	/**
 	 * Transfer John Doe's NFT to Jane Doe Wallet (technically, the Associated Token Account)
 	 */
 	console.info("+==== Transferring... ====+");
@@ -262,6 +262,37 @@ async function main(feePayer: Keypair) {
 		},
 	});
 	console.info("+==== Transferred ====+");
+
+
+	/**
+	 * Burn function works only with key pair for examples created Jane's adress so its out of this programm, because we send NFt to a publick adress and dont want to share its private key 
+	 
+	 console.info("+==== Burning... ====+");
+	 await burnPortfolioNftSendAndConfirm({
+		 mint: mint.publicKey,
+		 wallet: targetAddress,
+		 signers: {
+			 feePayer: feePayer,
+			 owner: janeDoeWallet,
+		 },
+	 });
+	 console.info("+==== Burned ====+");*/
+ 
+	 /**
+	
+	 mintAccount = await getMint(connection, mint.publicKey);
+	 console.info("+==== Mint ====+");
+	 console.info(mintAccount);
+	 */
+ 
+	 /**
+	  
+	
+	portfolioNFT = await getPortfolioMetadata(portfolioNFTPub);
+	 console.info("+==== Gem Metadata ====+");
+	 console.info(portfolioNFT);
+	 console.assert(typeof portfolioNFT!.assocAccount, "undefined");
+	 */
 
 
 
@@ -283,6 +314,7 @@ async function main(feePayer: Keypair) {
 
 
 fs.readFile(path.join(os.homedir(), ".config/solana/id.json")).then((file) =>
-    main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))),
+	main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))),
 );
+
 
